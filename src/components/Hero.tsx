@@ -15,7 +15,7 @@ const Hero = () => {
     const [loadedVideos, setLoadedVideos] = useState(0);
 
     const totalVideos = 3;
-    const nextVideodRef = useRef(null);
+    const nextVideodRef = useRef<HTMLVideoElement | null>(null);
 
     const handleVideoLoad = () => {
         setLoadedVideos(prev => prev + 1);
@@ -36,10 +36,13 @@ const Hero = () => {
         }
     }, [loadedVideos]);
 
-    useGSAP(() => {
+    const handleAsyncOperation = async () => {
+        await nextVideodRef.current?.play();
+    };
 
+    useGSAP(() => {
         if (hasClicked) {
-            gsap.set("#next-video", {visibility: 'visible'}); 
+            gsap.set("#next-video", { visibility: 'visible' });
         }
 
         gsap.to("#next-video", {
@@ -49,8 +52,10 @@ const Hero = () => {
             height: '100%',
             duration: 1,
             ease: 'power1.inOut',
-            onStart: () => nextVideodRef.current?.play(),
-        })
+            onStart: () => {
+                handleAsyncOperation();
+            },
+        });
 
         gsap.from('#current-video', {
             transformOrigin: 'center',
